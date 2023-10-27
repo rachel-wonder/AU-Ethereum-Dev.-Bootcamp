@@ -22,6 +22,7 @@ https://www.loom.com/share/0d3c74890b8e44a5918c4cacb3f646c4
 Written Instructions
 
 Clone this repository locally: https://github.com/alchemyplatform/ecdsa-node by running the following command from your command-line:
+
 git clone git@github.com:alchemyplatform/ecdsa-node.git
 
 Tips
