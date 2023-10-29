@@ -33,16 +33,11 @@ app.post("/send", (req, res) => {
   let signature = JSON.parse(signedMessage);
   signature.r = BigInt(signature.r);
   signature.s = BigInt(signature.s);
-  
-  //1. Incorporate Public Key Cryptography so transfers can only be completed with a valid signature
-  const isValid = secp256k1.verify(signature, msgHash, )
 
-
-  //TODO: recover the public address from the signature
-  //2. The person sending the transaction should have to verify that they own the private key corresponding to the address that is sending funds
+  //TODO: recover the public address from the signature and compare with the sender
   const recoverKey = signature.recoverPublicKey(msgHash);
   
-  if(toHex(recoverKey) !== sender) {
+  if(!(toHex(recoverKey) === sender)) {
     res.status(400).send({ message: "Not invalid sender!" });
   } else if (balances[sender] < amount) {
     res.status(400).send({ message: "Not enough funds!" });
