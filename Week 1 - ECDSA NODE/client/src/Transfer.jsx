@@ -21,12 +21,12 @@ function Transfer({ address, setBalance, privateKey }) {
     });
     const msgHash = keccak256(utf8ToBytes(message));
 
-    /* There is no option "recovered" in sign function anymore, you need to remove that argument */
-    let signedMessage = await secp256k1.sign( msgHash, privateKey );
+    let signedMessage = secp256k1.sign( msgHash, privateKey );
     signedMessage = JSON.stringify({
       ...signedMessage,
-      r: signedMessage.r.toString(),
-      s: signedMessage.s.toString(),
+      r: BigInt(signedMessage.r).toString(),
+      s: BigInt(signedMessage.s).toString(),
+      recovery: signedMessage.recovery,
     });
 
     //TODO: send signature
@@ -37,7 +37,6 @@ function Transfer({ address, setBalance, privateKey }) {
         sender: address,
         amount: parseInt(sendAmount),
         recipient,
-        msgHash,
         signedMessage,
       });
       setBalance(balance);

@@ -1,6 +1,7 @@
 const express = require("express");
 const { secp256k1 } = require("ethereum-cryptography/secp256k1");
-const { toHex } = require("ethereum-cryptography/utils"); 
+const { keccak256 } = require("ethereum-cryptography/keccak");
+const { toHex, utf8ToBytes } = require("ethereum-cryptography/utils"); 
 const app = express();
 const cors = require("cors");
 const port = 3042;
@@ -25,19 +26,31 @@ app.get("/balance/:address", (req, res) => {
 
 app.post("/send", (req, res) => {
   //TODO: get the signature from the client-side application
-  const { sender, recipient, amount, msgHash, signedMessage} = req.body;
+  const { sender, recipient, amount, signedMessage} = req.body;
   setInitialBalance(sender);
   setInitialBalance(recipient);
 
+  //hash message
+  const message = JSON.stringify({
+    sender,
+    amount,
+    recipient,
+  });
+  const msgHash = keccak256(utf8ToBytes(message));
+
+
   /* change signature back to it's original form which is s = bigint r = bigint recovery = number */
-  let signature = JSON.parse(signedMessage);
-  signature.r = BigInt(signature.r);
-  signature.s = BigInt(signature.s);
+  let sig = JSON.parse(signedMessage);
+  sig.r = BigInt(sig.r);
+  sig.s = BigInt(sig.s);
+  sig.recovery = sig.recovery;
+  
+  const signature = new secp256k1.Signature (sig.r, sig.s, sig.recovery);
 
   //TODO: recover the public address from the signature and compare with the sender
-  const recoverKey = signature.recoverPublicKey(msgHash);
+  const recoverKey = signature.recoverPublicKey(msgHash).toHex();
   
-  if(!(toHex(recoverKey) === sender)) {
+  if(recoverKey !== sender) {
     res.status(400).send({ message: "Not invalid sender!" });
   } else if (balances[sender] < amount) {
     res.status(400).send({ message: "Not enough funds!" });
