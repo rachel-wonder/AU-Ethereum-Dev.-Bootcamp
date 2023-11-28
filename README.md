@@ -30,6 +30,6 @@ Further mastery of the Solidity language.
 
 Further mastery of the Solidity language. Advanced concepts covered.
 
-### Week 7
+#### Week 7
 
 Exploration of smart contract use cases, using applications like Aave, Uniswap and Chainlink to deepen learning and gain inspiration for student projects. At this point, students should be starting to ideate their own projects. on
